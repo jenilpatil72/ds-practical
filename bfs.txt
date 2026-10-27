@@ -1,0 +1,76 @@
+def print_board(b):
+for i in range(0, 9, 3):
+print(b[i], '|', b[i+1], '|', b[i+2])
+print()
+def check_winner(b):
+wins = [(0,1,2),(3,4,5),(6,7,8),
+(0,3,6),(1,4,7),(2,5,8),
+(0,4,8),(2,4,6)]
+for a, b_, c in wins:
+if b[a] == b[b_] == b[c] != ' ':
+return b[a]
+return 'Draw' if ' ' not in b else None
+# Minimax with Alpha-Beta Pruning
+def minimax(b, max_player, player, alpha, beta):
+opp = 'O' if player == 'X' else 'X'
+w = check_winner(b)
+if w == player: return 1
+if w == opp: return -1
+if w == 'Draw': return 0
+if max_player:
+best = -float('inf')
+for i in range(9):
+if b[i] == ' ':
+b[i] = player
+val = minimax(b, False, player, alpha, beta)
+b[i] = ' '
+best = max(best, val)
+alpha = max(alpha, best)
+if beta <= alpha:
+break # Beta cut-off
+return best
+else:
+best = float('inf')
+for i in range(9):
+if b[i] == ' ':
+b[i] = opp
+val = minimax(b, True, player, alpha, beta)
+b[i] = ' '
+best = min(best, val)
+beta = min(beta, best)
+if beta <= alpha:
+break # Alpha cut-off
+return best
+def best_move(b, player):
+move, best_score = None, -float('inf')
+for i in range(9):
+if b[i] == ' ':
+b[i] = player
+score = minimax(b, False, player, -float('inf'), float('inf'))
+b[i] = ' '
+if score > best_score:
+best_score, move = score, i
+return move
+def play(player):
+board = [' '] * 9
+turn = 'X'
+print("Game start:")
+print_board(board)
+while True:
+if turn == player:
+m = best_move(board, player)
+print(f"Player ({player}) moves to {m}")
+else:
+m = best_move(board, 'O' if player == 'X' else 'X')
+print(f"Opponent ({turn}) moves to {m}")
+board[m] = turn
+print_board(board)
+w = check_winner(board)
+if w:
+if w == 'Draw': print("Game ended in a Draw.")
+elif w == player: print(f"Player ({player}) wins!")
+else: print(f"Opponent ({turn}) wins!")
+break
+turn = 'O' if turn == 'X' else 'X'
+# Run the game
+play('O') # Change to 'X' if you want the AI to play as Xge to 'X' to make AI play X
